@@ -25,7 +25,6 @@ io.on('connection', function(socket) {
     io.emit('queueUpdate', {
       queueLength: playerQueue.length
     });
-    console.log('ping')
   })
 })
 

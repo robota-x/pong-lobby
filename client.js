@@ -3,34 +3,44 @@
 $(document).ready(clientScript);
 
 function clientScript() {
-  var statusField = $('#current-status').val('Not connected.');
+  var statusText = $('#current-status').text('Disconnected');
+  var messageText = $('#current-message').text('Waiting to connect..');
   var socket;
 
   $('#server-connect').click(function() {
-    statusField.val('Client connecting...');
+    statusText.text('Client connecting...');
     socket = io()
     socketSetup();
   });
 
   $('#join-queue').click(function() {
     if(socket) {
+      statusText.text('Joining queue...');
       socket.emit('queueJoin');
     } else {
-      statusField.val('You\'re not connected to any server!');
+      messageText.text('You\'re not connected to any server!');
     }
   });
 
   function socketSetup() {
     socket.on('connectionSuccess', function(e) {
-      statusField.val('Connected!');
-    });
-
-    socket.on('lobbyUpdate', function(message) {
-      statusField.val('In lobby, ' + message.playerCount + ' other players present');
+      statusText.text('In lobby');
     });
 
     socket.on('queueJoinSuccess', function() {
-      statusField.val('Successfully joined game queue');
+      statusText.text('In queue');
+    });
+
+    socket.on('lobbyUpdate', function(message) {
+      if(statusText.text() == 'In lobby') {
+        messageText.text(message.playerCount + 'other players present');
+      }
+    });
+
+    socket.on('queueUpdate', function(message) {
+      if(statusText.text() == 'In queue') {
+        messageText.text(message.queueLength + 'other players in queue');
+      }
     });
   }
 }
