@@ -11,6 +11,17 @@ var PORT = 3000;
 var playerLobby = []
 var playerQueue = []
 
+function gameInit(playerOneID, playerTwoID) {
+  removePlayerFromQueue(playerOneID);
+  removePlayerFromQueue(playerTwoID);
+}
+
+function removePlayerFromQueue(playerID) {
+  var playerPosition = playerQueue.index(playerID);
+  playerPosition > -1 ? playerQueue.splice(playerPosition, 1) : null;
+}
+
+
 // sockets logic
 io.on('connection', function(socket) {
   playerLobby.push(socket.id);
