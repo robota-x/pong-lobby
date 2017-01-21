@@ -9,17 +9,26 @@ var PORT = 3000;
 
 // lobby logic
 var playerLobby = []
-var palyerQueue = []
+var playerQueue = []
 
 // sockets logic
 io.on('connection', function(socket) {
   playerLobby.push(socket.id);
   socket.emit('connectionSuccess');
-
   io.emit('lobbyUpdate', {
     playerCount: playerLobby.length
+  });
+
+  socket.on('queueJoin', function(){
+    playerQueue.push(socket.id);
+    socket.emit('queueJoinSuccess');
+    io.emit('queueUpdate', {
+      queueLength: playerQueue.length
+    });
+    console.log('ping')
   })
 })
+
 
 // serve dummy client content from here for now
 app.get('/', function(req, res){
