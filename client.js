@@ -3,14 +3,22 @@
 $(document).ready(clientScript);
 
 function clientScript() {
-  console.log('client connecting...');
-  var socket = io();
+  var statusField = $('#current-status');
+  var socket;
 
-  socket.on('connectionSuccess', function(e) {
-    console.log('connected!');
-  })
+  $('#server-connect').click(function() {
+    statusField.val('client connecting...');
+    socket = io()
+    socketSetup();
+  });
 
-  socket.on('lobbyUpdate', function(message) {
-    console.log('lobby update', message);
-  })
+  function socketSetup() {
+    socket.on('connectionSuccess', function(e) {
+      statusField.val('Connected!');
+    });
+
+    socket.on('lobbyUpdate', function(message) {
+      statusField.val('Connected, ' + message.playerCount + 'in Lobby.');
+    });
+  }
 }
