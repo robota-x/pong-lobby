@@ -62,7 +62,7 @@ function clientScript() {
 
     socket.on('queueUpdate', function(message) {
       if(statusText.text() == 'In queue') {
-        messageText.text(message.queueLength + 'other players in queue');
+        messageText.text(message.playerCount + 'other players in queue');
       }
     });
   }
