@@ -14,7 +14,11 @@ var palyerQueue = []
 // sockets logic
 io.on('connection', function(socket) {
   playerLobby.push(socket.id);
-  console.log(socket.id + 'connected, lobby is now: ' + playerLobby);
+  socket.emit('connectionSuccess');
+
+  io.emit('lobbyUpdate', {
+    playerCount: playerLobby.length
+  })
 })
 
 // serve dummy client content from here for now
