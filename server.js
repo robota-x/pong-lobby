@@ -7,8 +7,15 @@ var io = require('socket.io')(http);
 var PORT = 3000;
 
 
+// lobby logic
+var playerLobby = []
+var palyerQueue = []
 
-
+// sockets logic
+io.on('connection', function(socket) {
+  playerLobby.push(socket.id);
+  console.log(socket.id + 'connected, lobby is now: ' + playerLobby);
+})
 
 // serve dummy client content from here for now
 app.get('/', function(req, res){

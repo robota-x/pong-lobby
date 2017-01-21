@@ -1,5 +1,9 @@
 'use strict';
 
-console.log('client being loaded, jquery and io are')
-console.log($);
-console.log(io);
+$(document).ready(clientScript);
+
+function clientScript() {
+  console.log('client connecting...');
+  var socket = io();
+  console.log('...connected');
+}
