@@ -22,6 +22,15 @@ function clientScript() {
     }
   });
 
+  $('#start-game').click(function() {
+    if(statusText.text() == 'A game is ready to start') {
+      socket.emit('gameStart');
+    } else {
+      messageText.text('You game is not ready yet!');
+    }
+  })
+
+  // test button
   $('#test-button').click(function() {
     socket.emit('testEvent');
     console.log('test event sent to server');
@@ -36,8 +45,8 @@ function clientScript() {
       statusText.text('In queue');
     });
 
-    socket.on('gameReady', function() {
-      statusText.text('A game is ready to start');
+    socket.on('gameReady', function(message) {
+      statusText.text('Game ' + message.gameID + ' is ready to start');
     })
 
     socket.on('lobbyUpdate', function(message) {

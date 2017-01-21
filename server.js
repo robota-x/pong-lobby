@@ -10,12 +10,15 @@ var PORT = 3000;
 // lobby logic
 var playerLobby = []
 var playerQueue = []
+var gameList = []
 
 function gameInit(playerOneID, playerTwoID) {
-  removePlayerFromQueue(playerOneID);
-  removePlayerFromQueue(playerTwoID);
-  playerNotifyGameReady(playerOneID);
-  playerNotifyGameReady(playerTwoID);
+  var gameID = gameGenerateID();
+  removePlayerFromQueue(playerOneID, gameID);
+  removePlayerFromQueue(playerTwoID, gameID);
+  playerNotifyGameReady(playerOneID, gameID);
+  playerNotifyGameReady(playerTwoID, gameID);
+  gameList.push(gameID)
 }
 
 function removePlayerFromQueue(playerID) {
@@ -23,8 +26,14 @@ function removePlayerFromQueue(playerID) {
   playerPosition > -1 ? playerQueue.splice(playerPosition, 1) : null;
 }
 
-function playerNotifyGameReady(playerID) {
-  io.to(playerID).emit('gameReady');
+function playerNotifyGameReady(playerID, gameID) {
+  io.to(playerID).emit('gameReady', {
+    'gameID': gameID
+  });
+}
+
+function gameGenerateID() {
+  return 'Ananas';
 }
 
 // sockets logic
@@ -43,7 +52,7 @@ io.on('connection', function(socket) {
     });
   })
 
-  //test hook
+  // test hook
   socket.on('testEvent', function() {
     gameInit(playerQueue[0],playerQueue[1]);
   })
