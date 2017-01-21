@@ -10,7 +10,7 @@ Sockets.io cheat sheet so far
 - socket.join(identifier), socket.leave(identifier): joins/leave the socket to a room. Can be done server side only. Clients join a room with their name on connection.
 - Namespace: can't be joined or leaved, is the endpoint path on which the socket connects
 - any emit has the structure ('eventType', message). message can be a string or object. (unsure - kv pairs tested). if socket.send still work, it default to 'message' eventType.
-
+- io.sockets.connected[socketId]: grabs a socket by id.
 
 
 x1 On connection to the server, a client is registered in a lobby

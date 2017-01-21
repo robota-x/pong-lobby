@@ -10,36 +10,48 @@ var PORT = 3000;
 // lobby logic
 var playerLobby = []
 var playerQueue = []
-var gameList = []
+var gameList = {}
 
 function gameInit(playerOneID, playerTwoID) {
   var gameID = gameGenerateID();
-  removePlayerFromQueue(playerOneID, gameID);
-  removePlayerFromQueue(playerTwoID, gameID);
-  playerNotifyGameReady(playerOneID, gameID);
-  playerNotifyGameReady(playerTwoID, gameID);
-  gameList['gameID'] =  {
-      status: 'waiting',
-      readyPlayers: []
-    };
+  var playerList = [playerOneID, playerTwoID];
+  gameList[gameID] = {}
+  gameList[gameID][playerOneID] = 'waiting';
+  gameList[gameID][playerTwoID] = 'waiting';
+
+  playersRemoveFromQueue(playerList);
+  playersHookToRoom(playerList, gameID);
+  roomNotifyGameReady(gameID);
 }
 
-function removePlayerFromQueue(playerID) {
-  var playerPosition = playerQueue.indexOf(playerID);
-  playerPosition > -1 ? playerQueue.splice(playerPosition, 1) : null;
-}
-
-function playerNotifyGameReady(playerID, gameID) {
-  io.to(playerID).emit('gameReady', {
-    gameID: gameID
+function playersRemoveFromQueue(players) {
+  players.forEach(function(playerID) {
+    var playerPosition = playerQueue.indexOf(playerID);
+    playerPosition > -1 ? playerQueue.splice(playerPosition, 1) : null;
   });
+}
+
+function playersHookToRoom(players, gameID){
+  players.forEach(function(playerID) {
+    var playerSocket = io.sockets.connected[playerID];
+    playerSocket.join(gameID);
+    playerSocket.on('playerReady', function() {
+      gameList[gameID][playerID] = 'ready';
+      if(Object.values(gameList[gameID]).indexOf('waiting') < 0) {
+        io.to(gameID).emit('gameStart');
+      }
+    })
+  });
+}
+
+function roomNotifyGameReady(room) {
+  io.to(room).emit('gameReady');
 }
 
 function gameGenerateID() {
   return 'Ananas';
 }
 
-// sockets logic
 io.on('connection', function(socket) {
   playerLobby.push(socket.id);
   socket.emit('connectionSuccess');
@@ -55,20 +67,11 @@ io.on('connection', function(socket) {
     });
   });
 
-  socket.on('playerReady', function(message) {
-    var gameID = message.gameID
-    gameList[gameID].readyPlayers.push(socket.id);
-    if(gameList[gameID].readyPlayers.length == 2) {
-      io.to(gameID).emit('gameStart');
-    }
-  });
-
-
   // test hook
   socket.on('testEvent', function() {
-    gameInit(playerQueue[0],playerQueue[1]);
-  })
-})
+    gameInit(playerQueue[0], playerQueue[1]);
+  });
+});
 
 
 // serve dummy client content from here for now
