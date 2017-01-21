@@ -14,13 +14,18 @@ var playerQueue = []
 function gameInit(playerOneID, playerTwoID) {
   removePlayerFromQueue(playerOneID);
   removePlayerFromQueue(playerTwoID);
+  playerNotifyGameReady(playerOneID);
+  playerNotifyGameReady(playerTwoID);
 }
 
 function removePlayerFromQueue(playerID) {
-  var playerPosition = playerQueue.index(playerID);
+  var playerPosition = playerQueue.indexOf(playerID);
   playerPosition > -1 ? playerQueue.splice(playerPosition, 1) : null;
 }
 
+function playerNotifyGameReady(playerID) {
+  io.to(playerID).emit('gameReady');
+}
 
 // sockets logic
 io.on('connection', function(socket) {
@@ -36,6 +41,11 @@ io.on('connection', function(socket) {
     io.emit('queueUpdate', {
       queueLength: playerQueue.length
     });
+  })
+
+  //test hook
+  socket.on('testEvent', function() {
+    gameInit(playerQueue[0],playerQueue[1]);
   })
 })
 

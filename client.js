@@ -22,6 +22,11 @@ function clientScript() {
     }
   });
 
+  $('#test-button').click(function() {
+    socket.emit('testEvent');
+    console.log('test event sent to server');
+  })
+
   function socketSetup() {
     socket.on('connectionSuccess', function(e) {
       statusText.text('In lobby');
@@ -30,6 +35,10 @@ function clientScript() {
     socket.on('queueJoinSuccess', function() {
       statusText.text('In queue');
     });
+
+    socket.on('gameReady', function() {
+      statusText.text('A game is ready to start');
+    })
 
     socket.on('lobbyUpdate', function(message) {
       if(statusText.text() == 'In lobby') {
