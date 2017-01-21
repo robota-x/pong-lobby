@@ -20,8 +20,8 @@ x5 On game init, both clients get notified that the game is ready
 x5a On game init, the server create a unique game id and add that to a game list.
 x6 On confirmation from both players, the server starts the game
 x7 On game init, the server remove the two players from the queue if present
-8 On disconnection from the server, a client is removed from the lobby
-9 On disconnection from the server, a client is removed from the queue if present
+x8 On disconnection from the server, a client is removed from the lobby
+x9 On disconnection from the server, a client is removed from the queue if present
 10 On resources available (ahah this is going to be fun), the server pair the first 2 players in the queque and goes to game init
 
 11 On connection to server, a client old connection should be mantained if one is present

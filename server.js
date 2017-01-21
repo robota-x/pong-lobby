@@ -24,6 +24,13 @@ function gameInit(playerOneID, playerTwoID) {
   roomNotifyGameReady(gameID);
 }
 
+function playersRemoveFromLobby(players) {
+  players.forEach(function(playerID) {
+    var playerPosition = playerLobby.indexOf(playerID);
+    playerPosition > -1 ? playerLobby.splice(playerPosition, 1) : null;
+  });
+}
+
 function playersRemoveFromQueue(players) {
   players.forEach(function(playerID) {
     var playerPosition = playerQueue.indexOf(playerID);
@@ -52,20 +59,35 @@ function gameGenerateID() {
   return 'Ananas';
 }
 
-io.on('connection', function(socket) {
-  playerLobby.push(socket.id);
-  socket.emit('connectionSuccess');
+function sendLobbyCount() {
   io.emit('lobbyUpdate', {
     playerCount: playerLobby.length
   });
+}
+
+function sendQueueCount() {
+  io.emit('queueUpdate', {
+    playerCount: playerQueue.length
+  });
+}
+
+io.on('connection', function(socket) {
+  playerLobby.push(socket.id);
+  socket.emit('connectionSuccess');
+  sendLobbyCount();
 
   socket.on('queueJoin', function(){
     playerQueue.push(socket.id);
     socket.emit('queueJoinSuccess');
-    io.emit('queueUpdate', {
-      queueLength: playerQueue.length
-    });
+    sendQueueCount();
   });
+
+  socket.on('disconnect', function() {
+    playersRemoveFromQueue(socket.id);
+    playersRemoveFromLobby(socket.id);
+    sendLobbyCount();
+    sendQueueCount();
+  })
 
   // test hook
   socket.on('testEvent', function() {
