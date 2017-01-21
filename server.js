@@ -18,7 +18,10 @@ function gameInit(playerOneID, playerTwoID) {
   removePlayerFromQueue(playerTwoID, gameID);
   playerNotifyGameReady(playerOneID, gameID);
   playerNotifyGameReady(playerTwoID, gameID);
-  gameList.push(gameID)
+  gameList['gameID'] =  {
+      status: 'waiting',
+      readyPlayers: []
+    };
 }
 
 function removePlayerFromQueue(playerID) {
@@ -28,7 +31,7 @@ function removePlayerFromQueue(playerID) {
 
 function playerNotifyGameReady(playerID, gameID) {
   io.to(playerID).emit('gameReady', {
-    'gameID': gameID
+    gameID: gameID
   });
 }
 
@@ -50,7 +53,16 @@ io.on('connection', function(socket) {
     io.emit('queueUpdate', {
       queueLength: playerQueue.length
     });
-  })
+  });
+
+  socket.on('playerReady', function(message) {
+    var gameID = message.gameID
+    gameList[gameID].readyPlayers.push(socket.id);
+    if(gameList[gameID].readyPlayers.length == 2) {
+      io.to(gameID).emit('gameStart');
+    }
+  });
+
 
   // test hook
   socket.on('testEvent', function() {

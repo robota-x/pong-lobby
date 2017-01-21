@@ -6,6 +6,7 @@ function clientScript() {
   var statusText = $('#current-status').text('Disconnected');
   var messageText = $('#current-message').text('Waiting to connect..');
   var socket;
+  var gameID;
 
   $('#server-connect').click(function() {
     statusText.text('Client connecting...');
@@ -24,7 +25,10 @@ function clientScript() {
 
   $('#start-game').click(function() {
     if(statusText.text() == 'A game is ready to start') {
-      socket.emit('gameStart');
+      socket.emit('playerReady', {
+        gameID: gameID
+      });
+      messageText.text('Waiting on the other player to get ready...');
     } else {
       messageText.text('You game is not ready yet!');
     }
@@ -46,7 +50,8 @@ function clientScript() {
     });
 
     socket.on('gameReady', function(message) {
-      statusText.text('Game ' + message.gameID + ' is ready to start');
+      statusText.text('A game is ready to start');
+      gameID = message.gameID;
     })
 
     socket.on('lobbyUpdate', function(message) {
